@@ -4,6 +4,7 @@ import os
 import requests
 import zipfile
 import io
+import pathlib
 
 # restituisce la lista dei file della repo che mi serve
 API_URL = "https://api.github.com/repos/DomSamangy/NBA_Shots_04_25/contents"
@@ -39,6 +40,8 @@ def download_zip(file_info):
 def extract_zip(zip_path):
     with zipfile.ZipFile(zip_path, "r") as z:
         for name in z.namelist():
+            if name.startswith("__MACOSX"):
+                continue
             out_path = os.path.join(cartelladati, name)
             # Evita di estrarre più volte
             if not os.path.exists(out_path):
@@ -58,11 +61,10 @@ def main():
 
     for f in zip_files:
         if f["name"].endswith(".zip"):
-            extract_zip(download_zip(f))
+            zipfile=download_zip(f)
+            extract_zip(zipfile)
+            os.remove(zipfile)
             print("scaricato " + f["name"] + " con successo")
-        else:
-            print("il file " + f["name"] + " non è un .zip quindi non lo scarico")
-
     print("\nDati pronti in /data 🎉")
 
 if __name__ == "__main__":
