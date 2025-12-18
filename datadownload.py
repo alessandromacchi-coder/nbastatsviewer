@@ -3,8 +3,6 @@
 import os
 import requests
 import zipfile
-import io
-import pathlib
 
 # restituisce la lista dei file della repo che mi serve
 API_URL = "https://api.github.com/repos/DomSamangy/NBA_Shots_04_25/contents"
@@ -24,7 +22,7 @@ def fetch_file_list():
 def download_zip(file_info):
     local_path = os.path.join(cartelladati, file_info["name"])
 
-    # Se esiste già, non riscaricare
+    # se esiste già, non riscaricare
     if os.path.exists(local_path):
         print(f"Già presente: {file_info['name']}")
         return local_path
@@ -65,7 +63,6 @@ def main():
             extract_zip(zipfile)
             os.remove(zipfile)
             print("scaricato " + f["name"] + " con successo")
-    print("\nDati pronti in /data 🎉")
+    print(" dati pronti in /data ")
 
-if __name__ == "__main__":
-    main()
+main()
