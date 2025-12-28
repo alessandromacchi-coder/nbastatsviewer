@@ -3,10 +3,11 @@
 import os
 import requests
 import zipfile
+import pandas as pd
 
 # restituisce la lista dei file della repo che mi serve
 API_URL = "https://api.github.com/repos/DomSamangy/NBA_Shots_04_25/contents"
-cartelladati= "data"
+cartelladati= "data" #devi crearla se non esiste
 
 #controlla se la cartella esista e nel caso la crea
 def ensure_data_dir():
@@ -46,6 +47,18 @@ def extract_zip(zip_path):
                 print(f"Estraggo {name}...")
                 z.extract(name, cartelladati)
 
+def mergecsv():
+    tempdf=[]
+    for filename in os.listdir(cartelladati): #qui mi restituisce tutti i filename nella cartella data e li scorre uno ad uno 
+        if filename.endswith(".csv"): #il gitignore farebbe casino
+            filepath=os.path.join(cartelladati, filename) #concatena datadir e filename in un path unico
+            tempdf.append(pd.read_csv(filepath))    
+            print (f"{filename} caricato")
+    
+    df=pd.concat(tempdf, ignore_index=True)
+    df.to_csv("shots_all_seasons.csv", index=False) #manca di dirgli di metterla nella cartella giusta
+
+
 def main():
     ensure_data_dir()
     files = fetch_file_list()
@@ -64,5 +77,6 @@ def main():
             os.remove(zipfile)
             print("scaricato " + f["name"] + " con successo")
     print(" dati pronti in /data ")
+    mergecsv()
 
 main()
