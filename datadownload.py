@@ -25,7 +25,7 @@ def download_zip(file_info):
 
     # se esiste già, non riscaricare
     if os.path.exists(local_path):
-        print(f"Già presente: {file_info['name']}")
+        print(f"{file_info['name']} è già presente nella cartella")
         return local_path
 
     print(f"Scarico {file_info['name']}...")
@@ -44,10 +44,11 @@ def extract_zip(zip_path):
             out_path = os.path.join(cartelladati, name)
             # Evita di estrarre più volte
             if not os.path.exists(out_path):
-                print(f"Estraggo {name}...")
+                print(f"estraggo {name}...")
                 z.extract(name, cartelladati)
 
 def mergecsv():
+    print("unisco tutti i file in un csv unico")
     tempdf=[]
     for filename in os.listdir(cartelladati): #qui mi restituisce tutti i filename nella cartella data e li scorre uno ad uno 
         if filename.endswith(".csv"): #il gitignore farebbe casino
@@ -56,7 +57,8 @@ def mergecsv():
             print (f"{filename} caricato")
     
     df=pd.concat(tempdf, ignore_index=True)
-    df.to_csv("shots_all_seasons.csv", index=False) #manca di dirgli di metterla nella cartella giusta
+    outputpath=os.path.join(cartelladati, "shots_all_seasons.csv") #il .to_csv non accetta il nome della cartella, bisogna fare un path per forza, così unisco il file
+    df.to_csv(outputpath, index=False) #manca di dirgli di metterla nella cartella giusta
 
 
 def main():
@@ -75,8 +77,8 @@ def main():
             zipfile=download_zip(f)
             extract_zip(zipfile)
             os.remove(zipfile)
-            print("scaricato " + f["name"] + " con successo")
-    print(" dati pronti in /data ")
+            print(f["name"] + " pronto")
     mergecsv()
+    print(" dati pronti in /data ")
 
 main()

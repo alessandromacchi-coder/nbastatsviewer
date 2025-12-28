@@ -1,5 +1,5 @@
 import pandas as pd 
-import os 
+import os
 from matplotlib import pyplot as plt
 from matplotlib.patches import Circle, Rectangle, Arc
 datadir="data"
@@ -28,7 +28,7 @@ def findgame(shotsdf):
 
     if len(possiblegames) == 1:
         print("Game found!")
-        return possiblegames.loc[0, 'GAME_ID']
+        return possiblegames.iloc[0, 'GAME_ID']
 
     print("\nThese are the available games:\n")
     for i, row in possiblegames.iterrows():
@@ -36,15 +36,42 @@ def findgame(shotsdf):
 
     while True:
         try:
-            choice = int(input("\nInsert the index of the game you want to select: "))
+            choice = int(input("\n insert the number of the game you want to select "))
 
             if 0 <= choice < len(possiblegames):
                 return possiblegames.loc[choice, 'GAME_ID']
             else:
                 print("Invalid choice. Try again.")
-
         except ValueError:
             print("Please insert a valid integer.")
+
+
+def findplayer(shotsdf):
+    name = input("insert the name and surname of the player you are looking for (for example: Lebron James) \n")
+    id = (
+        shotsdf.loc[shotsdf['PLAYER_NAME'] == name, 'PLAYER_ID']
+        .iloc[0])
+    
+    #if id.empty:
+       # print("player not found, retry")
+
+    return id
+
+
+def findplayershots(id, shotsdf):
+
+    playerid = findplayer(shotsdf)
+
+    game = shotsdf[
+        (shotsdf['GAME_ID'] == id) &
+        (shotsdf['PLAYER_ID'] == playerid)
+        ]
+    
+    if game.empty:
+        print("no game was found with this id where that player has played, retry please")
+        return None
+    else:
+        return game.iloc[0, 'GAME_ID']
 
 
 def viewshots(gameid, df):
@@ -142,14 +169,27 @@ def draw_court(ax=None, color='black', lw=2, outer_lines=False, interval=20):
 
     return ax
 
-shots=mergecsv()
+gameid=0
+shots=pd.read_csv(os.path.join("data","shots_all_seasons.csv"))
 cond=True
 while cond:
-    choice=input("Choose an option to continue: ")
+    choice=input("Choose an option to continue: \n 1 to view every shot made/missed in a said game \n 2 to view every shot of a said player in a said game \n 3 to view ")
     match(choice):
-        case "Shots Made":
+        case "1":
             gameid=findgame(shots)
             viewshots(gameid, shots)
+        case "2":
+            print("")
+            if input("do you want to use the last gameid that was found? Y or N") == "Y":
+                if gameid==0:
+                    print("there was no previous research for a game")
+                else:
+                    playershots=findplayershots(gameid, shots)
+                    viewshots(gameid, shots)
+            else:
+                gameid=findgame(shots)
+                playershots=findplayershots(gameid, shots)
+                viewshots(gameid, shots)
         case "Change option":
             continue
         case "Exit":
