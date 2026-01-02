@@ -4,9 +4,6 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Circle, Rectangle, Arc
 datadir="data"
 
-
-
-
 def findgame(shotsdf):
     hometeam = input("Insert the home team name:\n")
     awayteam = input("Insert the away team name:\n")
@@ -45,22 +42,54 @@ def findgame(shotsdf):
         except ValueError:
             print("Please insert a valid integer.")
 
-
 def findplayer(shotsdf):
     name = input("insert the name and surname of the player you are looking for (for example: Lebron James) \n")
     id = (
         shotsdf.loc[shotsdf['PLAYER_NAME'] == name, 'PLAYER_ID']
         .iloc[0])
     
-    #if id.empty:
-       # print("player not found, retry")
+    if id==0:
+        print("player not found, retry")
 
     return id
 
+def playersfrommatch(gameid, shotsdf):
+    
+    game = shotsdf[shotsdf['GAME_ID'] == gameid]
+    
+    if game.empty:
+        print("no game found ")
+        return 0
+    
+    players=game['PLAYER_NAME'].unique()
+    
+    return players
+
+def find3ptshots(shotsdf):
+    season = int(input("insert the season you want to see (ex: if you want 2005-06, type in 2006) \n"))
+    player = findplayer(shotsdf)
+
+    seasonshots = shotsdf[
+        (shotsdf['SEASON_1'] == season) &
+        (shotsdf['PLAYER_ID'] == player) &
+        (shotsdf['SHOT_TYPE'] == "3PT Field Goal")
+        ]
+    
+    if seasonshots.empty:
+        print ("that player has never played in that season \n")
+        return 0
+    else:
+        return seasonshots
 
 def findplayershots(id, shotsdf):
 
+    players=playersfrommatch(id, shotsdf)
+    print(f"the available players in that game are: {players}")
+    
+
     playerid = findplayer(shotsdf)
+
+    print (f"this i player id {playerid} and this is game id {id}")
 
     game = shotsdf[
         (shotsdf['GAME_ID'] == id) &
@@ -69,15 +98,19 @@ def findplayershots(id, shotsdf):
     
     if game.empty:
         print("no game was found with this id where that player has played, retry please")
-        return None
+        return 0
     else:
-        return game.iloc[0, 'GAME_ID']
-
+        return game
 
 def viewshots(gameid, df):
-    # Filtra il dataframe per il game_id specifico
-    shots = df[df['GAME_ID'] == gameid]
     
+    if gameid != 0:
+        shots = df[df['GAME_ID'] == gameid]
+        graphtype="game"
+    else:
+        shots=df
+        graphtype="season"
+
     # Crea la figura
     fig, ax = plt.subplots(figsize=(12, 11))
 
@@ -104,7 +137,11 @@ def viewshots(gameid, df):
                color='red', label='Missed', alpha=0.6, marker='x', s=30)
 
     # Titolo e Legenda
-    ax.set_title(f"Game selected: {team_home} vs {team_away} ({team_season})", fontsize=15)
+    if graphtype=="game":
+        ax.set_title(f"Game selected: {team_home} vs {team_away} ({team_season})", fontsize=15)
+    elif graphtype=="season":
+        player= shots['PLAYER_NAME'].iloc[0]
+        ax.set_title(f"{player}'s shots from the {team_season} season")
     
     # Posiziona la legenda in modo che non copra il campo
     ax.legend(loc='upper right')
@@ -177,16 +214,17 @@ while cond:
     choice=input("Choose an option to continue: \n " \
     "1 to view every shot made/missed in a said game \n " \
     "2 to view every shot of a said player in a said game \n " \
+    "3 to view all 3 point shots of a said player in a said season \n " \
+    "4 to view all "
     "exit to quit \n ")
     match(choice):
         case "1":
             gameid=findgame(shots)
-            print (gameid)
-
             viewshots(gameid, shots)
         case "2":
             print("")
             if input("do you want to use the last gameid that was found? yes or no \n") == "yes":
+                print(f"using game id: {gameid}")
                 if gameid==0:
                     print("there was no previous research for a game")
                 else:
@@ -195,8 +233,12 @@ while cond:
             else:
                 gameid=findgame(shots)
                 playershots=findplayershots(gameid, shots)
-                viewshots(gameid, shots)
+                viewshots(gameid, playershots)
+        case "3":
+            seasonalshots=find3ptshots(shots)
+            viewshots(0, seasonalshots)
         case "Change option":
+            print(findplayer(shots))
             continue
         case "exit":
             cond=False
