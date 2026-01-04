@@ -1,5 +1,3 @@
-#ottengo i file dalla repo sorgente, filtro i .zip e li scarico in locale
-
 import os
 import requests
 import zipfile
@@ -44,19 +42,19 @@ def extract_zip(zip_path):
             out_path = os.path.join(cartelladati, name)
             # Evita di estrarre più volte
             if not os.path.exists(out_path):
-                print(f"Estraggo {name}...")
+                print(f"sto estraendo {name}...")
                 z.extract(name, cartelladati)
 
 def mergecsv():
     tempdf=[]
-    for filename in os.listdir(cartelladati): #qui mi restituisce tutti i filename nella cartella data e li scorre uno ad uno 
-        if filename.endswith(".csv"): #il gitignore farebbe casino
-            filepath=os.path.join(cartelladati, filename) #concatena datadir e filename in un path unico
+    for filename in os.listdir(cartelladati): 
+        if filename.endswith(".csv"): 
+            filepath=os.path.join(cartelladati, filename) 
             tempdf.append(pd.read_csv(filepath))    
             print (f"{filename} caricato")
     
     df=pd.concat(tempdf, ignore_index=True)
-    df.to_csv("shots_all_seasons.csv", index=False) #manca di dirgli di metterla nella cartella giusta
+    df.to_csv("shots_all_seasons.csv", index=False) 
 
 
 def main():
