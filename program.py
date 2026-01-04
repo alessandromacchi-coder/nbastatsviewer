@@ -61,7 +61,7 @@ def findgame(shotsdf):
         
 def findplayer(shotsdf):
     while True:
-        name = input("insert the name and surname of the player you are looking for (for example: Lebron James) \n")
+        name = input("insert the name and surname of the player you are looking for (full name, for example: Lebron James) \n")
         if name in shotsdf['PLAYER_NAME'].values:
             break
         else:
@@ -70,22 +70,47 @@ def findplayer(shotsdf):
     id = (shotsdf.loc[shotsdf['PLAYER_NAME'] == name, 'PLAYER_ID'].iloc[0])
     return id
 
+def shotpercent(shotsdf):
+    playerid=findplayer(shotsdf)
+    season = findseason(shotsdf)
+    playershots=shotsdf[(shotsdf['SEASON_1'] == season) &
+                (shotsdf['PLAYER_ID'] == playerid)]
+    playername = playershots['PLAYER_NAME'].iloc[0]
+
+    twopts=playershots[playershots["SHOT_TYPE"]== "2PT Field Goal"]
+    threepts=playershots[playershots["SHOT_TYPE"]== "3PT Field Goal"]
+    
+    if len(twopts) > 0:
+        percentage2  = round((twopts['SHOT_MADE'].sum() / len(twopts)) * 100,2)
+    else:
+        percentage2  = 0.0
+
+    if len(threepts) > 0:
+        percentage3 = round((threepts['SHOT_MADE'].sum() / len(threepts)) * 100,2)
+    else:
+        percentage3 = 0
+
+    return f"{playername} percentages from the {season-1}-{season} season were {percentage2} from 2 and {percentage3} from 3"
+
 def playersfrommatch(gameid, shotsdf):
     game = shotsdf[shotsdf['GAME_ID'] == gameid] 
     players=game['PLAYER_NAME'].unique()
     return players
 
-def find3ptshots(shotsdf):
+def findseason(shotsdf):
     while True:
         userinput = input("insert the season you want to see (ex: if you want 2005-06, type in 2006) \n")
         try:
             season = int(userinput)
             if season in shotsdf['SEASON_1'].values:
-                break  
+                return season  
             else:
                 print(f"season {season} is not valid (go from 2005 to 2025) \n")
         except ValueError:
             print("this value has to be a number(ex 2006), not text, retry \n")
+
+def find3ptshots(shotsdf):
+    season=findseason(shotsdf)
     
     while True:
         player = findplayer(shotsdf)
@@ -179,7 +204,7 @@ def viewshots(gameid, df, gmpl):
     player= shots['PLAYER_NAME'].iloc[0]
 
     if team_season in ['2019-20', '2020-21']: 
-            fattore_conversione = 3.28
+            fattore_conversione = 100
             offset=52.5
     
     if graphtype=="game":
@@ -279,7 +304,7 @@ def main():
         "1 to view every shot made/missed in a said game \n " \
         "2 to view every shot of a said player in a said game \n " \
         "3 to view all 3 point shots of a said player in a said season \n " \
-        "4 to view all "
+        "4 to view the shot percentages of a said player in a said season"
         "exit to quit \n ")
         match(choice):
             case "1":
@@ -303,9 +328,8 @@ def main():
             case "3":
                 seasonalshots=find3ptshots(shots)
                 viewshots(0, seasonalshots, 2)
-            case "Change option":
-                print(findplayer(shots))
-                continue
+            case "4":
+                print(shotpercent(shots))
             case "exit":
                 cond=False
 
