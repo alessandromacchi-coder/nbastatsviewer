@@ -76,6 +76,11 @@ def shotpercent(shotsdf):
     season = findseason(shotsdf)
     playershots=shotsdf[(shotsdf['SEASON_1'] == season) &
                 (shotsdf['PLAYER_ID'] == playerid)]
+    if playershots.empty:
+        seasons=shotsdf[(shotsdf['PLAYER_ID'] == playerid)]
+        seasonslist=seasons['SEASON_2'].unique().tolist()
+        return (f"this player has never played in that season, keep in mind he has only played in the {seasonslist} seasons, please retry ") 
+    
     playername = playershots['PLAYER_NAME'].iloc[0]
     displayseason= playershots['SEASON_2'].iloc[0]
     twopts=playershots[playershots["SHOT_TYPE"]== "2PT Field Goal"]
