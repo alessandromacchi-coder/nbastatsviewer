@@ -1,7 +1,0 @@
-
-ho voluto tenere i file nella repo remota in modo che chiunque possa modificare e runnare il codice senza dover scaricare i dati
-perché:
-• i file restano nella repo originale;
-• chi usa la tua repo non deve scaricare dati pesanti;
-• i CSV sono sempre aggiornati senza che tu faccia niente;
-• la tua repo rimane leggera e pulita.

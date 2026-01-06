@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from matplotlib import pyplot as plt
 from matplotlib.patches import Circle, Rectangle, Arc
+import sys
 datadir="data"
 
 def findgame(shotsdf):
@@ -267,7 +268,11 @@ def main():
         'NOH': 'New Orleans Hornets',
         'NOK': 'New Orleans/Oklahoma City Hornets',
     }
-    shots=pd.read_csv(os.path.join("data","shots_all_seasons.csv"), low_memory=False)
+    try:
+        shots=pd.read_csv(os.path.join("data","shots_all_seasons.csv"), low_memory=False)
+    except:
+        print("there was a problem with data gathering, remember to execute datadownload.py before this program to get data")
+        sys.exit()
     cond=True
     while cond:
         choice=input("choose an option to continue: \n " 
