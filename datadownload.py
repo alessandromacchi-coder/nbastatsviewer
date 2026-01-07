@@ -6,9 +6,6 @@ import pandas as pd
 API_URL = "https://api.github.com/repos/DomSamangy/NBA_Shots_04_25/contents"
 datadir= "data"
 
-def ensure_data_dir():
-    os.makedirs(datadir, exist_ok=True)
-
 def fetch_file_list():
     r = requests.get(API_URL) 
     r.raise_for_status() 
@@ -30,9 +27,9 @@ def download_zip(file_info):
     return local_path
 
 def extract_zip(zip_path):
-    with zipfile.ZipFile(zip_path, "r") as z:
+    with zipfile.ZipFile(zip_path, "r") as z: #so that it gets closed automatically
         for name in z.namelist():
-            if name.startswith("__MACOSX"):
+            if name.startswith("__MACOSX"):#might find gargabe zips from mac
                 continue
             out_path = os.path.join(datadir, name)
             if not os.path.exists(out_path):
@@ -48,12 +45,11 @@ def mergecsv():
             print (f"{filename} loaded")
     
     savepath=os.path.join(datadir, "shots_all_seasons.csv")
-    df=pd.concat(tempdf, ignore_index=True)
-    df.to_csv(savepath, index=False) 
+    df=pd.concat(tempdf, ignore_index=True) #to reset rows index
+    df.to_csv(savepath, index=False) #to not create a new index column
     print("all csvs merged successfully")
 
 def main():
-    ensure_data_dir()
     files = fetch_file_list()
 
     zip_files = [f for f in files if f["name"].endswith(".zip")]

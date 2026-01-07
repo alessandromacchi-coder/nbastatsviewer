@@ -3,7 +3,6 @@ import os
 from matplotlib import pyplot as plt
 from matplotlib.patches import Circle, Rectangle, Arc
 import sys
-datadir="data"
 
 def findgame(shotsdf):
     while True:
@@ -38,7 +37,7 @@ def findgame(shotsdf):
             (shotsdf['AWAY_TEAM'] == awayteam)
         ][['GAME_ID', 'GAME_DATE']]
         .drop_duplicates()
-        .reset_index(drop=True)
+        .reset_index(drop=True) #to view 0-1-2 in game choices
     )
 
     if possiblegames.empty:
@@ -49,8 +48,8 @@ def findgame(shotsdf):
         print("game found!")
         return possiblegames.loc[0, 'GAME_ID']
 
-    print("\nThese are the available games:\n")
-    for i, row in possiblegames.iterrows():
+    print("\n these are the available games:\n")
+    for i, row in possiblegames.iterrows(): #to view the df in rows as if it was a list
         print(f"[{i}] Date: {row['GAME_DATE']}")
 
     while True:
@@ -155,7 +154,7 @@ def viewshots(gameid, df, gmpl, nbateams):
         shots=df
         graphtype="season"
 
-    fig, ax = plt.subplots(figsize=(12, 11))
+    fig, ax = plt.subplots(figsize=(12, 11)) #creates two separate objects but returns them togheter
     draw_court(ax, outer_lines=True)
     fattore_conversione = 1
     offset=51.7
@@ -167,8 +166,8 @@ def viewshots(gameid, df, gmpl, nbateams):
     player= shots['PLAYER_NAME'].iloc[0]
 
     if team_season in ['2019-20', '2020-21', '2021-22']: 
-            fattore_conversione = 10 #solo quegli anni sono in decimi di piedi
-            offset=580 #al posto che differire di 5.2 piedi dal fondo differiscono di 5.7 per cambio calibrazione dei sensori
+            fattore_conversione = 10 #only those years are in tenths of feet
+            offset=580 #due to different calibrations every couple years data differs of about 5.8 feet instead of 5.2
     
     if graphtype=="game":
         completehome=nbateams.get(team_home, "not found")
@@ -205,7 +204,7 @@ def viewshots(gameid, df, gmpl, nbateams):
 
 def draw_court(ax=None, color='black', lw=2, outer_lines=False, interval=20):
     if ax is None:
-        ax = plt.gca()
+        ax = plt.gca() #gets current graph if not present
 
     hoop = Circle((0, 0), radius=7.5, linewidth=lw, color=color, fill=False)
     backboard = Rectangle((-30, -7.5), 60, -1, linewidth=lw, color=color)
@@ -229,11 +228,11 @@ def draw_court(ax=None, color='black', lw=2, outer_lines=False, interval=20):
         court_elements.append(outer_lines)
 
     for element in court_elements:
-        ax.add_patch(element)
+        ax.add_patch(element) #phisically draws every element
 
-    ax.set_aspect('equal', adjustable='box')
+    ax.set_aspect('equal', adjustable='box') #to view x and y axes in the same way
     ax.set_xlim(-250, 250)
-    ax.set_ylim(-47.5, 422.5)
+    ax.set_ylim(-47.5, 422.5) #to limit half court views
     return ax
 
 def main():
