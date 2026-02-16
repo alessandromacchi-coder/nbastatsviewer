@@ -289,6 +289,7 @@ def main():
             case "1":
                 gameplayer=False
                 gameid=findgame(shots)
+                print(gameid)
                 if gameid:
                     viewshots(gameid, shots, gameplayer, teamsdict)
             case "2":
