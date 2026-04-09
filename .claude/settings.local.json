@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python _add_dispensa3.py)",
+      "Bash(rm _add_dispensa3.py)",
+      "Bash(python _add_dispensa4.py)",
+      "Bash(rm _add_dispensa4.py)",
+      "Bash(python _add_dispensa5.py)",
+      "Bash(rm _add_dispensa5.py)",
+      "Bash(python _add_dispensa6.py)",
+      "Bash(rm _add_dispensa6.py)",
+      "Bash(python _add_dispensa7.py)",
+      "Bash(rm _add_dispensa7.py)",
+      "Bash(python _add_dispensa8.py)",
+      "Bash(rm _add_dispensa8.py)"
+    ]
+  }
+}
